@@ -51,7 +51,7 @@ GITHUB_WEBHOOK_SECRET=your-random-secret-here
 pdm run dev
 
 # Check health endpoint
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 ---
@@ -245,7 +245,7 @@ git config user.email "sentinel@yourcompany.com"
 4. **Verify Setup**:
    ```bash
    # Check webhook status
-   curl http://localhost:8000/webhook/status
+   curl http://localhost:8001/webhook/status
    ```
 
 ### Webhook Security
@@ -292,7 +292,7 @@ Optional:
 ALLOWED_ORIGINS=["https://your-app.com", "https://api.your-app.com"]
 
 # Development: Allow localhost
-ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
+ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8001"]
 
 # Testing: Allow all (not recommended for production)
 ALLOWED_ORIGINS=["*"]
@@ -314,7 +314,7 @@ ALLOWED_ORIGINS=["*"]
 # .env.development
 DEBUG=true
 LOG_LEVEL=DEBUG
-ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
+ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8001"]
 GITHUB_WEBHOOK_SECRET=""  # Disabled for local testing
 ```
 
@@ -351,7 +351,7 @@ GITHUB_WEBHOOK_SECRET=your-secure-secret-here
 The system validates configuration on startup:
 
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 **Validation Checks**:
@@ -433,14 +433,14 @@ echo "Check webhook secret in GitHub settings"
 pdm run dev
 
 # Test health endpoint
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # Test GitHub integration
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/github/issues?limit=1"
+     "http://localhost:8001/github/issues?limit=1"
 
 # Test webhook (if configured)
-curl -X POST "http://localhost:8000/webhook/test" \
+curl -X POST "http://localhost:8001/webhook/test" \
      -H "Content-Type: application/json" \
      -d '{"action": "labeled", "issue": {"number": 1, "labels": [{"name": "ai-ready"}]}, "label": {"name": "ai-ready"}}'
 ```
@@ -490,7 +490,7 @@ pdm run start
 
 ```bash
 # Monitor configuration changes
-watch -n 30 'curl -s http://localhost:8000/health | jq .configuration'
+watch -n 30 'curl -s http://localhost:8001/health | jq .configuration'
 ```
 
 ---

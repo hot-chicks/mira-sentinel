@@ -61,8 +61,8 @@ Sentinel System is an autonomous tool that:
    ```
 
 5. **Access the API**:
-   - Web UI: http://localhost:8000/docs
-   - Health check: http://localhost:8000/health
+   - Web UI: http://localhost:8001/docs
+   - Health check: http://localhost:8001/health
 
 ## API Endpoints
 
@@ -86,7 +86,7 @@ Sentinel System is an autonomous tool that:
 
 ## API Examples
 
-Here are `curl` examples for interacting with the main API endpoints. Replace `http://localhost:8000` with your service URL if it's different.
+Here are `curl` examples for interacting with the main API endpoints. Replace `http://localhost:8001` with your service URL if it's different.
 
 **Note**: For endpoints requiring authentication, replace `YOUR_GITHUB_TOKEN` with your actual GitHub Personal Access Token. For webhook examples, `YOUR_WEBHOOK_SECRET` is the secret configured for your GitHub webhook.
 
@@ -94,38 +94,38 @@ Here are `curl` examples for interacting with the main API endpoints. Replace `h
 
 #### Get Health Status
 ```bash
-curl -X GET "http://localhost:8000/health"
+curl -X GET "http://localhost:8001/health"
 ```
 
 ### GitHub Operations
 
 #### List GitHub Issues
 ```bash
-curl -X GET "http://localhost:8000/github/issues?state=open&labels=ai-ready" \
+curl -X GET "http://localhost:8001/github/issues?state=open&labels=ai-ready" \
      -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
 ```
 
 #### Get Specific GitHub Issue
 ```bash
-curl -X GET "http://localhost:8000/github/issues/123" \
+curl -X GET "http://localhost:8001/github/issues/123" \
      -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
 ```
 
 #### Process GitHub Issue with AI
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/process" \
+curl -X POST "http://localhost:8001/github/issues/123/process" \
      -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
 ```
 
 #### Approve AI Proposal for Issue
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/approve" \
+curl -X POST "http://localhost:8001/github/issues/123/approve" \
      -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
 ```
 
 #### Reject AI Proposal for Issue
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/reject" \
+curl -X POST "http://localhost:8001/github/issues/123/reject" \
      -H "Authorization: Bearer YOUR_GITHUB_TOKEN"
 ```
 
@@ -133,22 +133,22 @@ curl -X POST "http://localhost:8000/github/issues/123/reject" \
 
 #### Get Scheduler Status
 ```bash
-curl -X GET "http://localhost:8000/scheduler/status"
+curl -X GET "http://localhost:8001/scheduler/status"
 ```
 
 #### Start Scheduler
 ```bash
-curl -X POST "http://localhost:8000/scheduler/start"
+curl -X POST "http://localhost:8001/scheduler/start"
 ```
 
 #### Stop Scheduler
 ```bash
-curl -X POST "http://localhost:8000/scheduler/stop"
+curl -X POST "http://localhost:8001/scheduler/stop"
 ```
 
 #### Trigger Immediate Scheduler Run
 ```bash
-curl -X POST "http://localhost:8000/scheduler/run-now"
+curl -X POST "http://localhost:8001/scheduler/run-now"
 ```
 
 ### Webhook Endpoints
@@ -163,7 +163,7 @@ Replace `YOUR_WEBHOOK_SECRET` with the secret you configured for your GitHub web
 # The X-Hub-Signature-256 header is crucial for verification.
 # You'll need to generate a valid signature for your payload and secret.
 # For local testing without signature verification (if temporarily disabled in code):
-curl -X POST "http://localhost:8000/webhook/github" \
+curl -X POST "http://localhost:8001/webhook/github" \
      -H "Content-Type: application/json" \
      -H "X-GitHub-Event: issues" \
      -H "X-GitHub-Delivery: a1b2c3d4-e5f6-7890-1234-567890abcdef" \
@@ -185,7 +185,7 @@ curl -X POST "http://localhost:8000/webhook/github" \
 This endpoint allows you to test the webhook processing logic without needing a full GitHub event.
 
 ```bash
-curl -X POST "http://localhost:8000/webhook/test" \
+curl -X POST "http://localhost:8001/webhook/test" \
      -H "Content-Type: application/json" \
      -d '{
            "action": "labeled",
@@ -264,7 +264,7 @@ pdm run type-check
 ### Docker (Coming Soon)
 ```bash
 docker build -t sentinel-system .
-docker run -p 8000:8000 --env-file .env sentinel-system
+docker run -p 8001:8001 --env-file .env sentinel-system
 ```
 
 ### Manual Deployment

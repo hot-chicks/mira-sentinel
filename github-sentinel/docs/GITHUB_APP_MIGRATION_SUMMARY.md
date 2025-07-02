@@ -87,7 +87,7 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
 
 ### **Health Check Endpoint**
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 **GitHub App Mode Response:**
@@ -168,10 +168,10 @@ Subscribe to events:
 #### **Test Commands**
 ```bash
 # Test GitHub App health
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # Test webhook with repository context
-curl -X POST "http://localhost:8000/webhook/test" \
+curl -X POST "http://localhost:8001/webhook/test" \
      -H "Content-Type: application/json" \
      -d '{
        "action": "labeled",
