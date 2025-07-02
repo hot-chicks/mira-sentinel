@@ -1,4 +1,4 @@
-name: Build and Publish Sentinel System
+name: Build and Publish Sentinel System using Aider
 
 on:
   push:
