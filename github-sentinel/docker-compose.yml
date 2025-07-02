@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  sentinel-system:
+    image: sentinel-system-local
+    ports:
+      - "8000:8000"
+    environment:
+      # GitHub App Configuration (Recommended)
+      - GITHUB_APP_ID=${GITHUB_APP_ID:-}
+      - GITHUB_APP_PRIVATE_KEY_PATH=${GITHUB_APP_PRIVATE_KEY_PATH:-./github-app-private-key.pem}
+      - GITHUB_APP_INSTALLATION_IDS=${GITHUB_APP_INSTALLATION_IDS:-}
+
+      # Webhook Configuration
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET:-}
+
+      # Workspace Configuration
+      - WORKSPACE_BASE_DIR=/tmp/sentinel-workspaces
+
+      # Application Settings
+      - DEBUG=${DEBUG:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/project/logs
+
+      # Mount .env file
+      - ./.env:/project/.env:ro
+
+      # Mount GitHub App private key (if using GitHub App)
+      - ./github-app-private-key.pem:/project/github-app-private-key.pem:ro
+
+      # Mount workspace directory for repository operations
+      - sentinel-workspaces:/tmp/sentinel-workspaces
+
+      # Mount git config (optional, for git operations)
+      - ~/.gitconfig:/root/.gitconfig:ro
+
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Add necessary capabilities for git operations
+    cap_add:
+      - SYS_ADMIN  # For potential git operations
+
+    # Security context
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  sentinel-workspaces:
+    driver: local
+
+networks:
+  default:
+    name: sentinel-network
