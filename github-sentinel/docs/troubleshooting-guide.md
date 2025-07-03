@@ -25,7 +25,7 @@ Comprehensive troubleshooting guide for common issues and problems with the Sent
 First, always check the system health endpoint:
 
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 **Expected Healthy Response:**
@@ -46,7 +46,7 @@ curl http://localhost:8000/health
 
 ```bash
 # Check if the service is running
-curl -f http://localhost:8000/health/live || echo "Service not responding"
+curl -f http://localhost:8001/health/live || echo "Service not responding"
 
 # Check GitHub token
 curl -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user
@@ -317,7 +317,7 @@ claude -p "Hello, Claude!" --dangerously-skip-permissions
 
 2. **Check webhook status endpoint**:
    ```bash
-   curl http://localhost:8000/webhook/status
+   curl http://localhost:8001/webhook/status
    ```
 
 3. **Check logs for webhook events**:
@@ -335,7 +335,7 @@ claude -p "Hello, Claude!" --dangerously-skip-permissions
 2. **Test webhook locally with ngrok**:
    ```bash
    # Install ngrok for local testing
-   ngrok http 8000
+   ngrok http 8001
    
    # Use the ngrok URL for webhook
    # https://abcd1234.ngrok.io/webhook/github
@@ -408,7 +408,7 @@ grep -i "label.*ai-ready" logs/app.log
 
 3. **Test webhook manually**:
    ```bash
-   curl -X POST "http://localhost:8000/webhook/test" \
+   curl -X POST "http://localhost:8001/webhook/test" \
         -H "Content-Type: application/json" \
         -d '{
           "action": "labeled",
@@ -431,7 +431,7 @@ grep -i "label.*ai-ready" logs/app.log
 grep -A 10 "ERROR" logs/app.log | tail -20
 
 # Check specific endpoint
-curl -v http://localhost:8000/github/issues
+curl -v http://localhost:8001/github/issues
 ```
 
 **Solutions**:
@@ -439,7 +439,7 @@ curl -v http://localhost:8000/github/issues
 1. **Check configuration**:
    ```bash
    # Verify all required environment variables
-   curl http://localhost:8000/health
+   curl http://localhost:8001/health
    ```
 
 2. **Review error logs**:
@@ -464,7 +464,7 @@ curl -v http://localhost:8000/github/issues
 ```bash
 # Test with token
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     http://localhost:8000/github/issues
+     http://localhost:8001/github/issues
 
 # Test token validity
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
@@ -496,7 +496,7 @@ curl -H "Authorization: Bearer $GITHUB_TOKEN" \
 ```bash
 # Check GitHub rate limit status
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/github/status" | jq .rate_limit
+     "http://localhost:8001/github/status" | jq .rate_limit
 
 # Check logs for rate limit warnings
 grep -i "rate limit" logs/app.log
@@ -650,9 +650,9 @@ ssh -T git@github.com  # For SSH
 **Diagnosis**:
 ```bash
 # Test endpoint response times
-time curl http://localhost:8000/health
+time curl http://localhost:8001/health
 time curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     http://localhost:8000/github/issues
+     http://localhost:8001/github/issues
 
 # Check logs for slow operations
 grep -i "slow\|timeout" logs/app.log
@@ -814,7 +814,7 @@ grep -i log src/sentinel_system/config.py
 ps aux | grep python | grep sentinel
 
 # Check if port is open
-netstat -tlnp | grep :8000
+netstat -tlnp | grep :8001
 
 # Check for service errors
 journalctl -u sentinel-system --no-pager -n 50
@@ -928,7 +928,7 @@ rm -rf /tmp/sentinel_*
 sudo systemctl start sentinel-system
 
 # 5. Check health
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 ### Q: How do I enable debug logging?
@@ -950,7 +950,7 @@ pdm run dev
 
 ```bash
 # Test webhook processing
-curl -X POST "http://localhost:8000/webhook/test" \
+curl -X POST "http://localhost:8001/webhook/test" \
      -H "Content-Type: application/json" \
      -d '{
        "action": "labeled",
@@ -959,7 +959,7 @@ curl -X POST "http://localhost:8000/webhook/test" \
      }'
 
 # Test issue processing directly
-curl -X POST "http://localhost:8000/github/issues/123/process" \
+curl -X POST "http://localhost:8001/github/issues/123/process" \
      -H "Authorization: Bearer $GITHUB_TOKEN"
 ```
 
@@ -1008,7 +1008,7 @@ curl -H "Authorization: Bearer $GITHUB_TOKEN" \
 
 # 3. Update webhook URL in new repository
 # 4. Test configuration
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # 5. Restart service
 sudo systemctl restart sentinel-system
@@ -1020,7 +1020,7 @@ sudo systemctl restart sentinel-system
 
 ```bash
 # 1. Health check monitoring
-watch -n 30 'curl -s http://localhost:8000/health | jq .status'
+watch -n 30 'curl -s http://localhost:8001/health | jq .status'
 
 # 2. Log monitoring
 tail -f logs/app.log | grep -E "(ERROR|WARNING)"
@@ -1030,7 +1030,7 @@ watch -n 5 'ps aux | grep python | grep sentinel'
 
 # 4. GitHub API rate limit monitoring
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/github/status" | jq .rate_limit
+     "http://localhost:8001/github/status" | jq .rate_limit
 ```
 
 ---
@@ -1049,7 +1049,7 @@ If this troubleshooting guide doesn't resolve your issue:
    pdm --version
    
    # Service info
-   curl http://localhost:8000/health
+   curl http://localhost:8001/health
    
    # Recent logs
    tail -100 logs/app.log

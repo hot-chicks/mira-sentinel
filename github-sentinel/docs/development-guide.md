@@ -82,7 +82,7 @@ nano .env.development  # Edit with your settings
 # .env.development
 DEBUG=true
 LOG_LEVEL=DEBUG
-ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8000"]
+ALLOWED_ORIGINS=["http://localhost:3000", "http://localhost:8001"]
 GITHUB_TOKEN=your_development_token
 GITHUB_REPO=your-username/test-repo
 GITHUB_WEBHOOK_SECRET=""  # Disabled for local development
@@ -186,18 +186,18 @@ export $(cat .env.development | xargs)
 # Start server with hot reloading
 pdm run dev
 
-# Server will be available at http://localhost:8000
+# Server will be available at http://localhost:8001
 ```
 
 ### 2. API Documentation
 
-Visit http://localhost:8000/docs for interactive API documentation (Swagger UI).
+Visit http://localhost:8001/docs for interactive API documentation (Swagger UI).
 
 ### 3. Health Check
 
 ```bash
 # Test system health
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 
 # Expected response indicates all services are configured correctly
 ```
@@ -487,7 +487,7 @@ Create `.vscode/launch.json`:
             "args": [
                 "src.sentinel_system.main:app",
                 "--host", "0.0.0.0",
-                "--port", "8000",
+                "--port", "8001",
                 "--reload"
             ],
             "envFile": ".env.development",
@@ -524,11 +524,11 @@ grep "issue.*123" logs/app.log
 #### Health Monitoring
 ```bash
 # Monitor system health
-watch -n 30 'curl -s http://localhost:8000/health | jq'
+watch -n 30 'curl -s http://localhost:8001/health | jq'
 
 # Check GitHub rate limits
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/github/status"
+     "http://localhost:8001/github/status"
 ```
 
 ---

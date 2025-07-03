@@ -114,7 +114,7 @@ Authorization: Bearer YOUR_GITHUB_TOKEN
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:8000/github/issues?state=open&labels=ai-ready,bug&limit=5" \
+curl -X GET "http://localhost:8001/github/issues?state=open&labels=ai-ready,bug&limit=5" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -162,7 +162,7 @@ Authorization: Bearer YOUR_GITHUB_TOKEN
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:8000/github/issues/123" \
+curl -X GET "http://localhost:8001/github/issues/123" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -226,7 +226,7 @@ Authorization: Bearer YOUR_GITHUB_TOKEN
 
 **Example Request:**
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/process" \
+curl -X POST "http://localhost:8001/github/issues/123/process" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -297,7 +297,7 @@ Content-Type: application/json
 
 **Example Request:**
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/approve" \
+curl -X POST "http://localhost:8001/github/issues/123/approve" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx" \
      -H "Content-Type: application/json" \
      -d '{
@@ -349,7 +349,7 @@ Content-Type: application/json
 
 **Example Request:**
 ```bash
-curl -X POST "http://localhost:8000/github/issues/123/reject" \
+curl -X POST "http://localhost:8001/github/issues/123/reject" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx" \
      -H "Content-Type: application/json" \
      -d '{
@@ -387,7 +387,7 @@ Authorization: Bearer YOUR_GITHUB_TOKEN
 
 **Example Request:**
 ```bash
-curl -X GET "http://localhost:8000/github/labels" \
+curl -X GET "http://localhost:8001/github/labels" \
      -H "Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -505,7 +505,7 @@ Content-Type: application/json
 
 **Example Request:**
 ```bash
-curl -X POST "http://localhost:8000/webhook/github" \
+curl -X POST "http://localhost:8001/webhook/github" \
      -H "X-GitHub-Event: issues" \
      -H "X-GitHub-Delivery: 12345678-1234-1234-1234-123456789012" \
      -H "X-Hub-Signature-256: sha256=your-signature-here" \
@@ -646,7 +646,7 @@ export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
 
 # Use in API calls
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/github/issues"
+     "http://localhost:8001/github/issues"
 ```
 
 ### Using GitHub CLI Token
@@ -656,5 +656,5 @@ export GITHUB_TOKEN=$(gh auth token)
 
 # Verify token
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-     "http://localhost:8000/health"
+     "http://localhost:8001/health"
 ```

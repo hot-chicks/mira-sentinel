@@ -27,6 +27,6 @@ RUN pip install aider-chat
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 8001
 
 CMD ["pdm", "run", "start"] 
