@@ -125,11 +125,8 @@ class IssueProcessor:
             
             proposal = analysis_result.get("analysis", "")
             
-            # Create proposal comment
+            # Create clean, professional proposal comment
             comment = f"""🤖 **Sentinel System - Issue Analysis & Proposal**
-
-## My Understanding & Proposed Solution
-I've analyzed issue #{issue_number} and here's my assessment:
 
 {proposal}
 
@@ -138,9 +135,9 @@ I've analyzed issue #{issue_number} and here's my assessment:
 **⚠️ IMPORTANT**: This is a PROPOSAL only. No code changes have been made yet.
 
 **Next Steps:**
-- 👍 If you approve this proposal, add the `{settings.GITHUB_APPROVED_LABEL}` label
-- 👎 If you want changes, remove the `{settings.GITHUB_PROPOSAL_LABEL}` label and add feedback
-- 🔄 I'll refine the proposal based on your feedback
+- 👍 **Approve**: Add the `{settings.GITHUB_APPROVED_LABEL}` label to proceed with implementation
+- 👎 **Request Changes**: Remove the `{settings.GITHUB_PROPOSAL_LABEL}` label and add feedback comments
+- 🔄 **Refine**: I'll update the proposal based on your feedback
 
 Once approved, I'll implement the solution and create a pull request.
 

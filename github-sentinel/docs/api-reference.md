@@ -39,13 +39,13 @@ Comprehensive system health check including all dependencies.
   "timestamp": "2024-01-01T00:00:00Z",
   "dependencies": {
     "github_token": "valid",
-    "gemini_cli": "available",
+    "aider_cli": "available",
     "git_config": "configured",
     "repository_access": "accessible"
   },
   "configuration": {
     "github_repo": "owner/repo",
-    "gemini_model": "gemini-2.5-flash",
+    "aider_model": "claude-sonnet-4-20250514",
     "scheduler_enabled": false
   }
 }
@@ -64,7 +64,7 @@ Comprehensive system health check including all dependencies.
   },
   "errors": [
     "GitHub token is invalid or expired",
-    "Gemini CLI not found or not authenticated",
+    "Aider CLI not found or not authenticated",
     "Git user.name not configured"
   ]
 }

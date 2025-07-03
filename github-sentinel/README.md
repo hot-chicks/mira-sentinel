@@ -15,7 +15,8 @@ Sentinel System is an autonomous tool that:
 ## Features
 
 - **Automated Issue Detection**: Monitors GitHub repos for labeled issues
-- **AI-Powered Analysis**: Uses Claude Code CLI for intelligent issue analysis
+- **AI-Powered Analysis**: Uses Aider CLI with Claude Sonnet 4 for intelligent issue analysis
+- **Professional Output**: Clean, structured analysis format removing technical noise
 - **Human-in-the-Loop**: Requires human approval before implementation
 - **FastAPI Web Service**: RESTful API for monitoring and control
 - **Comprehensive Health Checks**: System status and dependency monitoring
@@ -50,9 +51,9 @@ Sentinel System is an autonomous tool that:
    ```
 
 3. **Required environment variables**:
-   - `GITHUB_TOKEN`: GitHub personal access token
-   - `GITHUB_REPO`: Target repository (owner/repo)
-   - `CLAUDE_MODEL`: Claude model (optional)
+   - `GITHUB_APP_ID`: GitHub App ID (recommended)
+   - `GITHUB_APP_PRIVATE_KEY_PATH`: Path to GitHub App private key
+   - `ANTHROPIC_API_KEY`: Anthropic API key for Claude Sonnet 4
    - See `env.example` for all options
 
 4. **Start the service**:
@@ -216,8 +217,8 @@ GITHUB_TOKEN=your_token
 GITHUB_REPO=owner/repo
 GITHUB_ISSUE_LABEL=sentinel-analyze
 
-# Claude Settings
-CLAUDE_MODEL=claude-sonnet-4-20250514
+# Anthropic Settings  
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 # Scheduler Settings
 SCHEDULER_INTERVAL_MINUTES=10

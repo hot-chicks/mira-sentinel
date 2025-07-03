@@ -88,23 +88,18 @@ GITHUB_REPO=your-username/test-repo
 GITHUB_WEBHOOK_SECRET=""  # Disabled for local development
 ```
 
-### 5. Gemini CLI Setup
+### 5. Aider CLI Setup
 
 ```bash
-# Install Google Cloud SDK
-curl https://sdk.cloud.google.com | bash
-exec -l $SHELL
+# Install Aider CLI
+pip install aider-chat
 
-# Install Gemini CLI
-gcloud components install gemini-cli
-
-# Authenticate
-gcloud auth login
-gcloud auth application-default login
+# Set Anthropic API key
+export ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 # Verify setup
-gemini --version
-gemini models list
+aider --help
+aider --version
 ```
 
 ### 6. Git Configuration
@@ -136,7 +131,7 @@ sentinel-system/
 │       │   └── webhook.py       # Webhook endpoints
 │       └── services/            # Business logic layer
 │           ├── __init__.py
-│           ├── gemini_service.py    # AI processing service
+│           ├── aider_service.py     # AI processing service (Aider + Claude)
 │           ├── github_service.py   # GitHub API service
 │           ├── git_service.py      # Git operations service
 │           └── issue_processor.py  # Main workflow orchestrator
@@ -367,7 +362,7 @@ tests/
 │   ├── test_github.py         # GitHub API tests
 │   └── test_webhook.py        # Webhook tests
 └── services/
-    ├── test_gemini_service.py # AI service tests
+    ├── test_aider_service.py  # AI service tests
     ├── test_github_service.py # GitHub service tests
     ├── test_git_service.py    # Git service tests
     └── test_issue_processor.py # Workflow tests

@@ -860,14 +860,14 @@ journalctl -u sentinel-system --no-pager -n 50
 2. Update `.env` file
 3. Restart service
 
-### "Gemini CLI not found or not authenticated"
+### "Aider CLI not found or not authenticated"
 
-**Cause**: Claude CLI not installed or not authenticated
+**Cause**: Aider CLI not installed or not authenticated
 
 **Fix**:
-1. Install Claude CLI
-2. Authenticate: `claude auth login`
-3. Test: `claude --help`
+1. Install Aider CLI: `pip install aider-chat`
+2. Configure Anthropic API key: `export ANTHROPIC_API_KEY=your_key_here`
+3. Test: `aider --help`
 
 ### "Repository access denied"
 

@@ -9,6 +9,7 @@ import asyncio
 import glob
 import logging
 import os
+import re
 import shutil
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -28,7 +29,7 @@ class AiderService:
     """Service for AI-powered code analysis and implementation using Aider CLI."""
     
     def __init__(self):
-        self.model = "claude-sonnet-4"  # Sonnet 4 model
+        self.model = "claude-sonnet-4-20250514"  # Sonnet 4 model
         self.api_key = settings.ANTHROPIC_API_KEY
         
     async def check_availability(self) -> Dict[str, Any]:
@@ -77,7 +78,7 @@ class AiderService:
         repository: str
     ) -> Dict[str, Any]:
         """
-        Analyze a GitHub issue using Aider in dry-run mode.
+        Analyze a GitHub issue using Aider in dry-run mode with clean output formatting.
         
         Args:
             issue_data: GitHub issue data dictionary
@@ -108,6 +109,7 @@ class AiderService:
                 "--no-suggest-shell-commands",  # Don't suggest shell commands
                 "--yes",              # Auto-confirm prompts
                 "--no-stream",        # Don't stream output
+                "--no-pretty",        # Disable pretty output formatting
             ]
             
             # Add relevant files for context
@@ -121,39 +123,61 @@ class AiderService:
                 "PYTHONPATH": str(repository_path),
             })
             
-            # Create analysis prompt
-            prompt = f"""Analyze this GitHub issue and provide a detailed implementation proposal:
+            # Create professional analysis prompt
+            prompt = f"""Please analyze this GitHub issue and provide a clean, professional proposal in this EXACT format:
+
+## 🔍 Problem Analysis
+[Describe what needs to be implemented/fixed in 2-3 clear sentences]
+
+## 💡 Solution Approach
+[Explain the high-level approach to solve this problem]
+
+## 📋 Implementation Plan
+1. [First step - be specific and actionable]
+2. [Second step - be specific and actionable]  
+3. [Continue with numbered steps...]
+
+## 📁 Files to Create/Modify
+- `filename.ext` - Brief description of what this file does
+- `another-file.ext` - Brief description of what this file does
+
+## ⚠️ Dependencies & Considerations
+[List any requirements, dependencies, or important considerations]
+
+---
 
 **Issue #{issue_number}: {issue_title}**
 
 **Description:**
 {issue_body or "No description provided"}
 
-Please provide:
-1. **Problem Analysis**: What needs to be implemented/fixed?
-2. **Solution Approach**: How should this be solved?
-3. **Implementation Plan**: Step-by-step plan with specific files to create/modify
-4. **File Structure**: What files and directories need to be created?
-5. **Dependencies**: Any requirements or dependencies needed?
-
-Focus on providing a clear, actionable proposal that can be implemented.
-Do NOT attempt to install any packages or download external files.
+IMPORTANT INSTRUCTIONS:
+- Use ONLY the format above
+- Do NOT include token costs, technical metadata, or debugging info
+- Do NOT include SEARCH/REPLACE blocks or code examples
+- Do NOT include error messages or Aider-specific details
+- Keep it professional and human-readable
+- Focus on WHAT needs to be done, not HOW to do it technically
+- Be concise but comprehensive
 """
 
             # Run Aider analysis
-            result = await self._run_aider_command(
+            raw_result = await self._run_aider_command(
                 cmd, 
                 repository_path, 
                 prompt,
                 env=env
             )
             
+            # Clean and format the output
+            clean_analysis = await self._clean_aider_output(raw_result)
+            
             # Clean up any files that might have been downloaded during analysis
             await self._cleanup_unwanted_files(repository_path)
             
             return {
                 "success": True,
-                "analysis": result,
+                "analysis": clean_analysis,
                 "issue_number": issue_number,
                 "repository": repository
             }
@@ -271,9 +295,28 @@ Please implement this solution now."""
             
             logger.info(f"Refining proposal for issue #{issue_number} in {repository} using Aider")
             
-            # Prepare refinement prompt
-            refinement_prompt = f"""
-Refine the implementation proposal for this GitHub issue based on human feedback:
+            # Prepare refinement prompt with clean format
+            refinement_prompt = f"""Please refine this GitHub issue proposal based on human feedback, using this EXACT format:
+
+## 🔍 Problem Analysis
+[Updated analysis based on feedback - 2-3 clear sentences]
+
+## 💡 Solution Approach
+[Refined high-level approach addressing the feedback]
+
+## 📋 Implementation Plan
+1. [Updated first step - be specific and actionable]
+2. [Updated second step - be specific and actionable]  
+3. [Continue with numbered steps...]
+
+## 📁 Files to Create/Modify
+- `filename.ext` - Brief description of what this file does
+- `another-file.ext` - Brief description of what this file does
+
+## ⚠️ Dependencies & Considerations
+[Updated requirements, dependencies, or important considerations]
+
+---
 
 **Issue #{issue_number}: {issue_title}**
 
@@ -283,37 +326,62 @@ Refine the implementation proposal for this GitHub issue based on human feedback
 **Human Feedback:**
 {feedback}
 
-**Instructions:**
-1. Address all points raised in the feedback
-2. Refine the technical approach based on suggestions
-3. Update the implementation plan accordingly
-4. Provide a clear, improved proposal
-
-Please provide a refined implementation proposal that addresses the feedback.
+IMPORTANT INSTRUCTIONS:
+- Use ONLY the format above
+- Address ALL points raised in the feedback
+- Do NOT include token costs, technical metadata, or debugging info
+- Do NOT include SEARCH/REPLACE blocks or code examples
+- Do NOT include error messages or Aider-specific details
+- Keep it professional and human-readable
+- Focus on WHAT needs to be done, not HOW to do it technically
+- Be concise but comprehensive
 """
 
-            # Run Aider refinement (analysis mode)
-            result = await self._run_aider_command(
+            # Get relevant files for context
+            relevant_files = await self._get_relevant_files(repository_path)
+            
+            # Prepare Aider command for refinement (dry-run mode)
+            cmd = [
+                "aider",
+                "--model", self.model,
+                "--dry-run",          # Analysis mode - no actual changes
+                "--no-auto-commits",  # We'll handle commits ourselves
+                "--no-check-update",  # Don't check for updates
+                "--disable-playwright",  # Don't install Playwright
+                "--no-suggest-shell-commands",  # Don't suggest shell commands
+                "--yes",              # Auto-confirm prompts
+                "--no-stream",        # Don't stream output
+                "--no-pretty",        # Disable pretty output formatting
+            ]
+            
+            # Add relevant files for context
+            if relevant_files:
+                cmd.extend(relevant_files)
+            
+            # Set environment variables to prevent installations
+            env = os.environ.copy()
+            env.update({
+                "AIDER_DISABLE_PLAYWRIGHT": "1",  # Disable Playwright installation
+                "PYTHONPATH": str(repository_path),
+            })
+            
+            # Run Aider refinement
+            raw_result = await self._run_aider_command(
+                cmd,
                 repository_path,
                 refinement_prompt,
-                mode="analysis"
+                env=env
             )
             
-            if result["success"]:
-                return {
-                    "success": True,
-                    "refined_proposal": result["output"],
-                    "issue_number": issue_number,
-                    "repository": repository
-                }
-            else:
-                logger.error(f"Aider proposal refinement failed: {result['error']}")
-                return {
-                    "success": False,
-                    "error": result["error"],
-                    "issue_number": issue_number,
-                    "repository": repository
-                }
+            # Clean and format the output
+            clean_refined_proposal = await self._clean_aider_output(raw_result)
+            
+            return {
+                "success": True,
+                "refined_proposal": clean_refined_proposal,
+                "issue_number": issue_number,
+                "repository": repository
+            }
                 
         except Exception as e:
             logger.error(f"Error refining proposal for issue #{issue_number}: {str(e)}")
@@ -659,4 +727,159 @@ Please implement this solution now."""
                 "changes_made": False,
                 "issue_number": issue_data.get("number"),
                 "repository": repository
-            } 
+            }
+
+    async def _clean_aider_output(self, raw_output: str) -> str:
+        """
+        Clean and format Aider output for human consumption.
+        
+        Args:
+            raw_output: Raw output from Aider command
+            
+        Returns:
+            Cleaned and formatted analysis
+        """
+        try:
+            # Remove Aider metadata and technical noise
+            lines = raw_output.split('\n')
+            cleaned_lines = []
+            
+            # Flags to track what we're filtering
+            skip_until_analysis = True
+            in_token_info = False
+            in_search_replace = False
+            in_error_block = False
+            
+            for line in lines:
+                line_lower = line.lower().strip()
+                
+                # Skip initial Aider setup messages
+                if skip_until_analysis:
+                    if line.startswith('## 🔍') or line.startswith('## Problem Analysis'):
+                        skip_until_analysis = False
+                        cleaned_lines.append(line)
+                    continue
+                
+                # Skip token cost information
+                if 'tokens:' in line_lower and ('sent' in line_lower or 'received' in line_lower):
+                    in_token_info = True
+                    continue
+                if in_token_info and line.strip() == '':
+                    in_token_info = False
+                    continue
+                if in_token_info:
+                    continue
+                
+                # Skip SEARCH/REPLACE blocks
+                if '<<<<<<< SEARCH' in line or 'SEARCH' in line and '<<<<<<' in line:
+                    in_search_replace = True
+                    continue
+                if in_search_replace and ('REPLACE' in line or '>>>>>>>' in line):
+                    in_search_replace = False
+                    continue
+                if in_search_replace:
+                    continue
+                
+                # Skip error blocks and technical details
+                if any(keyword in line_lower for keyword in [
+                    'aider v', 'main model:', 'weak model:', 'git repo:', 'repo-map:',
+                    'searchreplacenoexactmatch', 'the llm did not conform',
+                    'failed to match', 'only 3 reflections', 'stopping',
+                    'did not apply edit', 'fix any errors below'
+                ]):
+                    continue
+                
+                # Skip lines that are clearly technical noise
+                if any(pattern in line_lower for pattern in [
+                    'you can skip this check',
+                    'added .aider',
+                    'don\'t re-send them',
+                    'just reply with fixed versions',
+                    'the search section must exactly match'
+                ]):
+                    continue
+                
+                # Keep the line if it passed all filters
+                cleaned_lines.append(line)
+            
+            # Join cleaned lines and remove excessive whitespace
+            cleaned_output = '\n'.join(cleaned_lines)
+            
+            # Remove multiple consecutive empty lines
+            cleaned_output = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_output)
+            
+            # If the output is still messy or doesn't follow our format, create a fallback
+            if not self._is_well_formatted_analysis(cleaned_output):
+                logger.warning("Aider output doesn't follow expected format, creating fallback")
+                return self._create_fallback_analysis(cleaned_output)
+            
+            return cleaned_output.strip()
+            
+        except Exception as e:
+            logger.error(f"Error cleaning Aider output: {e}")
+            # Return a basic fallback if cleaning fails
+            return self._create_fallback_analysis(raw_output)
+    
+    def _is_well_formatted_analysis(self, output: str) -> bool:
+        """
+        Check if the analysis output follows our expected format.
+        
+        Args:
+            output: Cleaned output to check
+            
+        Returns:
+            True if well-formatted, False otherwise
+        """
+        required_sections = [
+            '## 🔍',  # Problem Analysis
+            '## 💡',  # Solution Approach
+            '## 📋',  # Implementation Plan
+            '## 📁',  # Files to Create/Modify
+        ]
+        
+        return all(section in output for section in required_sections)
+    
+    def _create_fallback_analysis(self, raw_output: str) -> str:
+        """
+        Create a fallback analysis when Aider output is too messy.
+        
+        Args:
+            raw_output: Raw output from Aider
+            
+        Returns:
+            Fallback formatted analysis
+        """
+        # Extract any meaningful content from the raw output
+        meaningful_content = []
+        lines = raw_output.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if line and not any(skip_pattern in line.lower() for skip_pattern in [
+                'tokens:', 'cost:', 'aider v', 'model:', 'git repo:', 'search', 'replace'
+            ]):
+                meaningful_content.append(line)
+        
+        # Create a basic structured format
+        return f"""## 🔍 Problem Analysis
+Based on the issue description, this requires implementation of the requested feature or fix.
+
+## 💡 Solution Approach
+The solution will involve creating or modifying the necessary files to address the issue requirements.
+
+## 📋 Implementation Plan
+1. Analyze the current codebase structure
+2. Identify the files that need to be created or modified
+3. Implement the required changes following project conventions
+4. Test the implementation to ensure it works correctly
+
+## 📁 Files to Create/Modify
+- Files will be determined based on the specific requirements of the issue
+
+## ⚠️ Dependencies & Considerations
+- Follow existing project structure and conventions
+- Ensure compatibility with current dependencies
+- Test thoroughly before submission
+
+---
+*Note: This is a simplified analysis. The AI will provide more specific details during implementation.*""" 

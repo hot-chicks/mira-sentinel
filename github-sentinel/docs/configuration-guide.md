@@ -150,41 +150,39 @@ python -c "import secrets; print(secrets.token_hex(32))"
 
 ---
 
-## Gemini CLI Setup
+## Aider CLI Setup
 
 ### Prerequisites
 
-The Sentinel System uses Google's Gemini CLI for AI functionality. You need to:
+The Sentinel System uses Aider CLI with Claude Sonnet 4 for AI functionality. You need to:
 
-1. **Install Gemini CLI**:
+1. **Install Aider CLI**:
    ```bash
-   # Follow Google's official installation guide
-   curl -sSL https://sdk.cloud.google.com | bash
-   gcloud components install gemini-cli
+   # Install via pip
+   pip install aider-chat
    ```
 
-2. **Authenticate with Google**:
+2. **Configure Anthropic API Key**:
    ```bash
-   gcloud auth login
-   gcloud auth application-default login
+   # Set your Anthropic API key
+   export ANTHROPIC_API_KEY=your_anthropic_api_key_here
    ```
 
 3. **Verify Installation**:
    ```bash
-   gemini --version
-   gemini models list  # Should show available models
+   aider --help
+   aider --version  # Should show Aider version
    ```
 
 ### Configuration
 
-#### `GEMINI_MODEL`
+#### `ANTHROPIC_API_KEY`
 - **Type**: String
-- **Default**: `gemini-2.5-flash`
-- **Description**: Gemini model to use for AI processing
-- **Options**: `gemini-2.5-flash`, `gemini-pro`, etc.
-- **Example**: `GEMINI_MODEL=gemini-pro`
+- **Required**: Yes
+- **Description**: Anthropic API key for Claude Sonnet 4 access
+- **Example**: `ANTHROPIC_API_KEY=sk-ant-api03-...`
 
-**Note**: The system uses the authenticated Google account's default project and credentials. No API key is required in the environment file.
+**Note**: The system uses Claude 3.5 Sonnet (20241022) model by default. The API key is required for Aider to function properly.
 
 ---
 
