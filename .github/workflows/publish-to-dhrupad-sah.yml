@@ -1,4 +1,4 @@
-name: Build and Publish Sentinel System using Aider
+name: Build and Publish Sentinel System to dhrupad-sah
 
 on:
   push:
