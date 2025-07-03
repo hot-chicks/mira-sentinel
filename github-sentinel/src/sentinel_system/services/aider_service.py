@@ -28,7 +28,7 @@ class AiderService:
     """Service for AI-powered code analysis and implementation using Aider CLI."""
     
     def __init__(self):
-        self.model = "claude-3-5-sonnet-20241022"  # Sonnet 4 model
+        self.model = "claude-sonnet-4"  # Sonnet 4 model
         self.api_key = settings.ANTHROPIC_API_KEY
         
     async def check_availability(self) -> Dict[str, Any]:
