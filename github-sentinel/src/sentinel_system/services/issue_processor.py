@@ -206,21 +206,18 @@ Once approved, I'll implement the solution and create a pull request.
             branch_name = f"{settings.GIT_BRANCH_PREFIX}{issue_number}"
             await self.git_service.create_branch(branch_name, repo_dir)
             
-            # Get AI to implement the solution using AiderService
-            # Create a mock issue object for the implement_solution method
-            from types import SimpleNamespace
-            mock_issue = SimpleNamespace(number=issue_number)
-            
-            implementation_result = await self.aider_service.implement_solution(
-                mock_issue, repo_dir, repository
+            # Get AI to implement the solution using AiderService legacy method
+            # This method works with dictionaries instead of issue objects
+            implementation_result = await self.aider_service.implement_solution_legacy(
+                issue_data, approved_proposal, repo_dir, repository
             )
             
-            # The new implement_solution method returns a string, not a dict
-            if "failed" in implementation_result.lower():
-                raise Exception(f"Aider implementation failed: {implementation_result}")
+            # The legacy implement_solution method returns a dictionary
+            if not implementation_result.get("success"):
+                raise Exception(f"Aider implementation failed: {implementation_result.get('error', 'Unknown error')}")
             
-            implementation = implementation_result
-            changes_made = True  # Assume changes were made if no error occurred
+            implementation = implementation_result.get("implementation", "")
+            changes_made = implementation_result.get("changes_made", False)
             
             # Check if there are any changes to commit
             has_changes = await self.git_service.has_changes(repo_dir)
