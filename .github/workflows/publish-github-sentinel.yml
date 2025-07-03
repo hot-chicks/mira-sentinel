@@ -2,7 +2,7 @@ name: Build and Publish Sentinel System
 
 on:
   push:
-    branches: ["main"]
+    branches: ["feat/claude-compatible"]
     paths:
       - 'github-sentinel/src/**'
       - 'github-sentinel/pyproject.toml'
