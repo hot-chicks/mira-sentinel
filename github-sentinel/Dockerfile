@@ -2,11 +2,16 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including Node.js
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Claude Code CLI globally
+RUN npm install -g @anthropic-ai/claude-code
 
 # Install PDM
 RUN pip install -U pdm
