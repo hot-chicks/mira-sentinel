@@ -224,6 +224,7 @@ IMPORTANT INSTRUCTIONS:
                 "--no-suggest-shell-commands",  # Don't suggest shell commands
                 "--yes",              # Auto-confirm prompts
                 "--no-stream",        # Don't stream output
+                "--auto-test", "false",  # Don't run tests automatically
             ]
             
             # Add relevant files for context
@@ -237,19 +238,23 @@ IMPORTANT INSTRUCTIONS:
                 "PYTHONPATH": str(repo_dir),
             })
             
-            # Create implementation prompt
-            prompt = f"""Implement the following approved solution for issue #{issue.number}:
+            # Create implementation prompt - be more direct and specific
+            prompt = f"""You are implementing an approved solution. Create the necessary files immediately without asking for confirmation.
 
+**Issue #{issue.number}**
+
+**Approved Solution to Implement:**
 {proposal}
 
-Requirements:
-1. Create the necessary files and directories
-2. Follow the project structure and conventions
-3. Do NOT install any additional packages or dependencies
-4. Do NOT download external files
+**DIRECT IMPLEMENTATION INSTRUCTIONS:**
+1. CREATE the files specified in the proposal immediately
+2. DO NOT ask for confirmation or permission
+3. DO NOT explain what you're going to do - just do it
+4. Follow the project structure and conventions
 5. Focus on creating documentation and code files only
+6. Do NOT install packages or download external files
 
-Please implement this solution now."""
+**IMPORTANT:** This is an approved solution. Implement it now by creating the required files."""
 
             # Run Aider with the implementation prompt
             result = await self._run_aider_command(
@@ -683,22 +688,23 @@ IMPORTANT INSTRUCTIONS:
                 "PYTHONPATH": str(repository_path),
             })
             
-            # Create implementation prompt
-            prompt = f"""Implement the following approved solution for issue #{issue_number}:
+            # Create implementation prompt - be more direct and specific
+            prompt = f"""You are implementing an approved solution. Create the necessary files immediately without asking for confirmation.
 
-**Issue: {issue_title}**
+**Issue #{issue_number}: {issue_title}**
 
-**Approved Proposal:**
+**Approved Solution to Implement:**
 {proposal}
 
-Requirements:
-1. Create the necessary files and directories
-2. Follow the project structure and conventions
-3. Do NOT install any additional packages or dependencies
-4. Do NOT download external files
+**DIRECT IMPLEMENTATION INSTRUCTIONS:**
+1. CREATE the files specified in the proposal immediately
+2. DO NOT ask for confirmation or permission
+3. DO NOT explain what you're going to do - just do it
+4. Follow the project structure and conventions
 5. Focus on creating documentation and code files only
+6. Do NOT install packages or download external files
 
-Please implement this solution now."""
+**IMPORTANT:** This is an approved solution. Implement it now by creating the required files."""
 
             # Run Aider with the implementation prompt
             result = await self._run_aider_command(
